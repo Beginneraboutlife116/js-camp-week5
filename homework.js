@@ -122,7 +122,7 @@ function getAllCategories(products) {
  * @returns {number} - 回傳數字（原價 × 數量 的總和）
  */
 function calculateCartOriginalTotal(carts) {
-	// 請實作此函式
+	return carts.reduce((accu, item) => accu + item.product.origin_price * item.quantity, 0);
 }
 
 /**
@@ -131,7 +131,7 @@ function calculateCartOriginalTotal(carts) {
  * @returns {number} - 回傳數字（售價 × 數量 的總和）
  */
 function calculateCartTotal(carts) {
-	// 請實作此函式
+	return carts.reduce((accu, item) => accu + item.product.price * item.quantity, 0);
 }
 
 /**
@@ -140,7 +140,10 @@ function calculateCartTotal(carts) {
  * @returns {number} - 回傳原價總金額 - 售價總金額
  */
 function calculateSavings(carts) {
-	// 請實作此函式
+	const originPriceTotal = calculateCartOriginalTotal(carts);
+	const priceTotal = calculateCartTotal(carts);
+
+	return originPriceTotal - priceTotal;
 }
 
 /**
@@ -149,7 +152,7 @@ function calculateSavings(carts) {
  * @returns {number} - 回傳所有商品的 quantity 總和
  */
 function calculateCartItemCount(carts) {
-	// 請實作此函式
+	return carts.reduce((accu, item) => accu + item.quantity, 0);
 }
 
 /**
@@ -159,7 +162,9 @@ function calculateCartItemCount(carts) {
  * @returns {boolean} - 回傳 true 或 false
  */
 function isProductInCart(carts, productId) {
-	// 請實作此函式
+	const found = carts.find(item => item.product.id === productId);
+
+	return !!found;
 }
 
 // ========================================
