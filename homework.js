@@ -56,13 +56,7 @@ const orders = [
  * @returns {Object|null} - 回傳產品物件，找不到回傳 null
  */
 function getProductById(products, productId) {
-	for (const product of products) {
-		if (product.id === productId) {
-			return product;
-		}
-	}
-
-	return null;
+	return products.find(product => product.id === productId) || null;
 }
 
 /**
@@ -77,6 +71,7 @@ function getProductsByCategory(products, category) {
 	if (category === ALL) {
 		return products;
 	}
+
 	return products.filter(product => product.category === category)
 }
 
@@ -162,9 +157,7 @@ function calculateCartItemCount(carts) {
  * @returns {boolean} - 回傳 true 或 false
  */
 function isProductInCart(carts, productId) {
-	const found = carts.find(item => item.product.id === productId);
-
-	return !!found;
+	return carts.some(item => item.product.id === productId);
 }
 
 // ========================================
@@ -180,20 +173,28 @@ function isProductInCart(carts, productId) {
  * 如果產品已存在，合併數量；如果不存在，新增一筆
  */
 function addToCart(carts, product, quantity) {
-	const newCarts = carts.slice();
-	const foundIndex = newCarts.findIndex(item => item.product.id === product.id);
+	const { id: productId } = product
+	if (isProductInCart(carts, productId)) {
+		return carts.map(item => {
+			if (item.product.id === productId) {
+				return {
+					...item,
+					quantity: item.quantity + quantity,
+				}
+			}
 
-	if (foundIndex === -1) {
+			return item;
+		})
+	} else {
+		const newCarts = carts.slice();
 		newCarts.push({
-			id: `cart-${newCarts.length + 1}`,
+			id: crypto.randomUUID(),
 			product,
 			quantity,
 		})
-	} else {
-		newCarts[foundIndex].quantity += quantity;
-	}
 
-	return newCarts;
+		return newCarts;
+	}
 }
 
 /**
@@ -250,11 +251,7 @@ function clearCart() {
 function calculateTotalRevenue(orders) {
 	return orders.reduce((accu, order) => {
 		if (order.paid) {
-			accu += order.products.reduce((accu, item) => {
-				accu += item.price * item.quantity;
-
-				return accu;
-			}, 0);
+			return accu + order.total;
 		}
 
 		return accu;
@@ -288,7 +285,9 @@ function generateOrderReport(orders) {
 	const paidOrders = filterOrdersByStatus(orders, true).length;
 	const unpaidOrders = filterOrdersByStatus(orders, false).length;
 	const totalRevenue = calculateTotalRevenue(orders);
-	const averageOrderValue = Math.round(totalRevenue / totalOrders);
+
+	const totalOrderValue = orders.reduce((accu, order) => accu + order.total, 0)
+	const averageOrderValue = Math.round(totalOrderValue / totalOrders);
 
 	return {
 		totalOrders,
