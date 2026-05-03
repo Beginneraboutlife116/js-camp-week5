@@ -56,7 +56,13 @@ const orders = [
  * @returns {Object|null} - 回傳產品物件，找不到回傳 null
  */
 function getProductById(products, productId) {
-	// 請實作此函式
+	for (const product of products) {
+		if (product.id === productId) {
+			return product;
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -66,7 +72,12 @@ function getProductById(products, productId) {
  * @returns {Array} - 回傳符合分類的產品陣列，若 category 為 '全部' 則回傳全部產品
  */
 function getProductsByCategory(products, category) {
-	// 請實作此函式
+	const ALL = '全部';
+
+	if (category === ALL) {
+		return products;
+	}
+	return products.filter(product => product.category === category)
 }
 
 /**
@@ -76,7 +87,10 @@ function getProductsByCategory(products, category) {
  * 計算方式：Math.round((price / origin_price) * 100) / 10
  */
 function getDiscountRate(product) {
-	// 請實作此函式
+	const { origin_price, price } = product;
+	const rate = Math.round((price / origin_price) * 100) / 10;
+
+	return `${rate}折`;
 }
 
 /**
@@ -85,7 +99,17 @@ function getDiscountRate(product) {
  * @returns {Array} - 回傳分類陣列，例如 ['衣服', '褲子', '鞋子', '配件']
  */
 function getAllCategories(products) {
-	// 請實作此函式
+	const categorySet = new Set();
+	const categories = [];
+
+	products.forEach(({ category }) => {
+		if (!categorySet.has(category)) {
+			categorySet.add(category);
+			categories.push(category);
+		}
+	});
+
+	return categories;
 }
 
 // ========================================
