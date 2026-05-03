@@ -248,7 +248,17 @@ function clearCart() {
  * @returns {number} - 只計算已付款 (paid: true) 的訂單
  */
 function calculateTotalRevenue(orders) {
-	// 請實作此函式
+	return orders.reduce((accu, order) => {
+		if (order.paid) {
+			accu += order.products.reduce((accu, item) => {
+				accu += item.price * item.quantity;
+
+				return accu;
+			}, 0);
+		}
+
+		return accu;
+	}, 0);
 }
 
 /**
@@ -258,7 +268,7 @@ function calculateTotalRevenue(orders) {
  * @returns {Array} - 回傳篩選後的訂單陣列
  */
 function filterOrdersByStatus(orders, isPaid) {
-	// 請實作此函式
+	return orders.filter(order => order.paid === isPaid);
 }
 
 /**
@@ -274,7 +284,19 @@ function filterOrdersByStatus(orders, isPaid) {
  * }
  */
 function generateOrderReport(orders) {
-	// 請實作此函式
+	const totalOrders = orders.length;
+	const paidOrders = filterOrdersByStatus(orders, true).length;
+	const unpaidOrders = filterOrdersByStatus(orders, false).length;
+	const totalRevenue = calculateTotalRevenue(orders);
+	const averageOrderValue = Math.round(totalRevenue / totalOrders);
+
+	return {
+		totalOrders,
+		paidOrders,
+		unpaidOrders,
+		totalRevenue,
+		averageOrderValue,
+	}
 }
 
 /**
@@ -287,7 +309,17 @@ function generateOrderReport(orders) {
  * }
  */
 function groupOrdersByPayment(orders) {
-	// 請實作此函式
+	return orders.reduce((accu, order) => {
+		const { payment } = order.user;
+
+		if (accu[payment]) {
+			accu[payment].push(order);
+		} else {
+			accu[payment] = [order];
+		}
+
+		return accu;
+	}, {})
 }
 
 // ========================================
