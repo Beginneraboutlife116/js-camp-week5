@@ -285,8 +285,8 @@ function filterOrdersByStatus(orders, isPaid) {
  */
 function generateOrderReport(orders) {
 	const totalOrders = orders.length;
-	const paidOrders = orders.filter(order => order.paid).length;
-	const unpaidOrders = orders.filter(order => !order.paid).length;
+	const paidOrders = filterOrdersByStatus(orders, true).length;
+	const unpaidOrders = filterOrdersByStatus(orders, false).length;
 	const totalRevenue = calculateTotalRevenue(orders);
 	const averageOrderValue = Math.round(totalRevenue / totalOrders);
 
